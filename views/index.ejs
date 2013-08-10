@@ -14,7 +14,23 @@
       type="text/css" rel="stylesheet" />
     <script type="text/javascript">
       var socket = io.connect();
-    
+      $(function() {
+        $(".call").on("click", function() {
+
+          // The properties of this object will be sent as POST
+          // Parameters to URL which generates TwiML.
+          Twilio.Device.connect({
+            CallerId: "<%= phone_number %>", // Replace this value with a verified Twilio number:
+                                     // https://www.twilio.com/user/account/phone-numbers/verified
+
+            PhoneNumber:$("#number").val() //pass in the value of the text field
+          });
+        });
+
+        $(".hangup").on("click", function() {
+          Twilio.Device.disconnectAll();
+        });
+
       /* Create the Client with a Capability Token */
       Twilio.Device.setup("<%= token %>", {debug: true});
    
@@ -26,16 +42,17 @@
       Twilio.Device.incoming(function(connection) {
         $( "#dialog-confirm" ).dialog({
           resizable: false,
-          height:250,
           modal: true,
           autoOpen: false,
           buttons: {
             "Accept": function() {
               connection.accept();
+              $("#log").html("Call answered!");
               $( this ).dialog( "close" );
             },
             "Reject": function() {
               connection.reject();
+              $("#log").html("Call rejected! Awaiting next call.");
               $( this ).dialog( "close" );
             }
           }
@@ -46,7 +63,7 @@
       });
 
       Twilio.Device.disconnect(function(connection) {
-        $("#log").html("Awaiting incoming call...");
+        $("#log").html("Ready");
       });
    
       /* Report any errors on the screen */
@@ -63,21 +80,6 @@
         $("#dialog-confirm").html("<i>" + data.number + "</i><br /><b>" + data.name + "</b><img src='" + data.photo + "' />");
         $( "#dialog-confirm" ).dialog( "open" );
       });
-
-      $(".call").on("click", function() {
-
-        // The properties of this object will be sent as POST
-        // Parameters to URL which generates TwiML.
-        Twilio.Device.connect({
-          CallerId: "<%= phone_number %>", // Replace this value with a verified Twilio number:
-                                   // https://www.twilio.com/user/account/phone-numbers/verified
-
-          PhoneNumber:$("#number").val() //pass in the value of the text field
-        });
-      });
-
-      $(".hangup").click(function() {
-        Twilio.Device.disconnectAll();
       });
 
     </script>
