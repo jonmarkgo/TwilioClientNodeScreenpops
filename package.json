@@ -1,0 +1,20 @@
+{
+    "name": "TwilioClientNodeScreenpops",
+    "version": "0.0.1",
+    "author": "Jon Gottfried <jonmarkgo@twilio.com>",
+    "description": "a simple example of displaying screen pops using Node.js, Twilio Client, and FullContact API",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jonmarkgo/TwilioClientNodeScreenpops.git"
+    },
+    "dependencies": {
+        "socket.io": "0.9.x",
+        "twilio": "1.1.x",
+        "express": "3.3.x",
+        "ejs": "0.8.x",
+        "fullcontact-api": "0.0.x"
+    },
+    "engines": {
+        "node": ">=0.10"
+    }
+}
