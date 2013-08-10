@@ -23,7 +23,7 @@ app.get('/', function(req, res) {
 io.sockets.on('connection', function(socket) {
   console.log('socket.io connected');
   socket.on('incoming', function(caller) {
-    fullcontact.person.findByPhone("+18453045375", "US", function(err, person) {
+    fullcontact.person.findByPhone(caller, "US", function(err, person) {
       var details = {
         number: caller,
         name: person.contactInfo.fullName,
