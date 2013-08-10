@@ -1,4 +1,5 @@
-var app = require('express')()
+var express = require('express')
+  , app = express()
   , http = require('http')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
@@ -7,15 +8,21 @@ var app = require('express')()
 
 server.listen(3000);
 
+app.use(express.bodyParser());
+
 app.get('/', function(req, res) {
+  res.render('index.ejs');
+});
+
+app.post('/client', function(req, res) {
   var capability = new twilio.Capability(
       process.env.TWILIO_ACCOUNT_SID,
       process.env.TWILIO_AUTH_TOKEN
   );
 
-  capability.allowClientIncoming('screenpopdemo');
+  capability.allowClientIncoming(req.body.name);
   capability.allowClientOutgoing(process.env.TWILIO_APP_SID);
-  res.render('index.ejs', {
+  res.render('client.ejs', {
       token: capability.generate(),
       phone_number: process.env.TWILIO_PHONE_NUMBER
   });

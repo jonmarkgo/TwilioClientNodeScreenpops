@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twilio Client Screenpop Test</title>
+    <script type="text/javascript"
+      src="//static.twilio.com/libs/twiliojs/1.1/twilio.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+    <link href="//static0.twilio.com/packages/quickstart/client.css"
+      type="text/css" rel="stylesheet" />
+    <script type="text/javascript">
+      var socket = io.connect();
+      $(function() {
+        $(".call").on("click", function() {
+
+          // The properties of this object will be sent as POST
+          // Parameters to URL which generates TwiML.
+          Twilio.Device.connect({
+            CallerId: "<%= phone_number %>", // Replace this value with a verified Twilio number:
+                                     // https://www.twilio.com/user/account/phone-numbers/verified
+
+            PhoneNumber:$("#number").val() //pass in the value of the text field
+          });
+        });
+
+        $(".hangup").on("click", function() {
+          Twilio.Device.disconnectAll();
+        });
+
+      /* Create the Client with a Capability Token */
+      Twilio.Device.setup("<%= token %>", {debug: true});
+   
+      /* Let us know when the client is ready. */
+      Twilio.Device.ready(function (device) {
+          $("#log").text("Ready");
+      });
+
+      Twilio.Device.incoming(function(connection) {
+        $( "#dialog-confirm" ).dialog({
+          resizable: false,
+          modal: true,
+          autoOpen: false,
+          buttons: {
+            "Accept": function() {
+              connection.accept();
+              $("#log").html("Call answered!");
+              $( this ).dialog( "close" );
+            },
+            "Reject": function() {
+              connection.reject();
+              $("#log").html("Call rejected! Awaiting next call.");
+              $( this ).dialog( "close" );
+            }
+          }
+        });
+
+        $("#log").html("Incoming call from " + connection.parameters.From);
+        socket.emit("incoming",connection.parameters.From);
+      });
+
+      Twilio.Device.disconnect(function(connection) {
+        $("#log").html("Ready");
+      });
+   
+      /* Report any errors on the screen */
+      Twilio.Device.error(function (error) {
+          $("#log").text("Error: " + error.message);
+      });
+   
+      Twilio.Device.connect(function (conn) {
+          $("#log").text("Successfully established call");
+      });
+
+      socket.on('foundPerson', function(data) {
+
+        $("#dialog-confirm").html("<i>" + data.number + "</i><br /><b>" + data.name + "</b><img src='" + data.photo + "' />");
+        $( "#dialog-confirm" ).dialog( "open" );
+      });
+      });
+
+    </script>
+  </head>
+  <body>
+    <div id="dialog-confirm" title="Receive Call?" style="display: none">
+    </div>
+    <button class="call">
+      Call
+    </button>
+    <button class="hangup">
+      Hangup
+    </button>
+    <input id="number" type="text" placeholder="Enter a number like +16519998888"/>
+    <div id="log">Loading pigeons...</div>
+  </body>
+</html>
