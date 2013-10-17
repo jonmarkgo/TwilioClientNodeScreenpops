@@ -31,55 +31,55 @@
           Twilio.Device.disconnectAll();
         });
 
-      /* Create the Client with a Capability Token */
-      Twilio.Device.setup("<%= token %>", {debug: true});
-   
-      /* Let us know when the client is ready. */
-      Twilio.Device.ready(function (device) {
-          $("#log").text("Ready");
-      });
-
-      Twilio.Device.incoming(function(connection) {
-        $( "#dialog-confirm" ).dialog({
-          resizable: false,
-          modal: true,
-          autoOpen: false,
-          buttons: {
-            "Accept": function() {
-              connection.accept();
-              $("#log").html("Call answered!");
-              $( this ).dialog( "close" );
-            },
-            "Reject": function() {
-              connection.reject();
-              $("#log").html("Call rejected! Awaiting next call.");
-              $( this ).dialog( "close" );
-            }
-          }
+        /* Create the Client with a Capability Token */
+        Twilio.Device.setup("<%= token %>", {debug: true});
+     
+        /* Let us know when the client is ready. */
+        Twilio.Device.ready(function (device) {
+            $("#log").text("Ready");
         });
 
-        $("#log").html("Incoming call from " + connection.parameters.From);
-        socket.emit("incoming",connection.parameters.From);
-      });
+        Twilio.Device.incoming(function(connection) {
+          $( "#dialog-confirm" ).dialog({
+            resizable: false,
+            modal: true,
+            autoOpen: false,
+            buttons: {
+              "Accept": function() {
+                connection.accept();
+                $("#log").html("Call answered!");
+                $( this ).dialog( "close" );
+              },
+              "Reject": function() {
+                connection.reject();
+                $("#log").html("Call rejected! Awaiting next call.");
+                $( this ).dialog( "close" );
+              }
+            }
+          });
 
-      Twilio.Device.disconnect(function(connection) {
-        $("#log").html("Ready");
-      });
-   
-      /* Report any errors on the screen */
-      Twilio.Device.error(function (error) {
-          $("#log").text("Error: " + error.message);
-      });
-   
-      Twilio.Device.connect(function (conn) {
-          $("#log").text("Successfully established call");
-      });
+          $("#log").html("Incoming call from " + connection.parameters.From);
+          socket.emit("incoming",connection.parameters.From);
+        });
 
-      socket.on('foundPerson', function(data) {
+        Twilio.Device.disconnect(function(connection) {
+          $("#log").html("Ready");
+        });
+     
+        /* Report any errors on the screen */
+        Twilio.Device.error(function (error) {
+            $("#log").text("Error: " + error.message);
+        });
+     
+        Twilio.Device.connect(function (conn) {
+            $("#log").text("Successfully established call");
+        });
 
-        $("#dialog-confirm").html("<i>" + data.number + "</i><br /><b>" + data.name + "</b><img src='" + data.photo + "' />");
-        $( "#dialog-confirm" ).dialog( "open" );
-      });
+        socket.on('foundPerson', function(data) {
+
+          $("#dialog-confirm").html("<i>" + data.number + "</i><br /><b>" + data.name + "</b><img src='" + data.photo + "' />");
+          $( "#dialog-confirm" ).dialog( "open" );
+        });
       });
 
     </script>
