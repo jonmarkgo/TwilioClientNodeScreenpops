@@ -55,11 +55,10 @@ io.sockets.on('connection', function(socket) {
 });
 
 app.post('/incoming', function(req, res) {
-
   var resp = new twilio.TwimlResponse();
 
   resp.dial(function() {
-    this.client(req.body.clientName);
+    this.client(req.query.clientName);
   });
   res.set('Content-Type', 'text/xml');
   res.send(resp.toString());
